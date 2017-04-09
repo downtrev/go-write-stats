@@ -1,7 +1,9 @@
 WORK_DIR=`pwd`
 AGENT=`echo $WORK_DIR |sed 's|\/|\n|g' |grep agent`
 GIT_REV=`echo $GO_REVISION |sed 's/.//8g'`
-if [[ "$GO_ENVIRONMENT_NAME" == *QA* ]]; then  ARTIFACT=`find . -name *$GIT_REV*QA.deb`;else  ARTIFACT=`find . -name *$GIT_REV*PROD.deb`; fi
+ENV_FLAG=`echo $GO_ENVIRONMENT_NAME |cut -c 1`
+PATTERN="*${GIT_REV}*${ENV_FLAG}*.deb"
+ARTIFACT=`find . -name $PATTERN |sed 's!.*\/!!g'`
 AUTHOR_NAME=`git log -n 1 --pretty=format:"%an"`
 AUTHOR_NAME=`echo $AUTHOR_NAME |sed 's| |_|g'` 
 AUTHOR_EMAIL=`git log -n 1 --pretty=format:"%ae"`

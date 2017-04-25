@@ -1,10 +1,12 @@
 #!/bin/bash
-
-USAGE='Usage: "./post2slack <STAGE|PROD>"'
+USAGE='Usage: "post2slack <STAGE|PROD>"'
 ENVIRONMENT=${1^^}
-
-if [[ "${ENVIRONMENT}" == stage ]]; then  GO_ENVIRONMENT_NAME="";else  GO_ENVIRONMENT_NAME="Production_Installs"; fi
-
+if [ "${ENVIRONMENT}" == 'STAGE' ]; then  echo ${ENVIRONMENT};
+elif [ "${ENVIRONMENT}" == 'PROD' ]; then  echo ${ENVIRONMENT};
+else
+    echo $USAGE
+    exit 1
+fi
 PRODUCT="adcenter"
 BRANCH=`git rev-parse --abbrev-ref HEAD`
 WORK_DIR=`pwd`
@@ -32,3 +34,9 @@ curl -x http://squid.dfw2.lijit.com:3128 -i -XPOST 'http://build3.dfw2.lijit.com
 echo "======================================="
 echo ""
 echo ""
+SLACK_URL="https://hooks.slack.com/services/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"
+SLACK_CHANNEL="production-release"
+SLACK_MESSAGE="--${PRODUCT} [${BRANCH}] deployed to ${ENVIRONMENT}, with version $GO_PIPELINE_LABEL"
+SLACK_MESSAGE=$(echo $SLACK_MESSAGE | sed 's/"/\"/g' | sed "s/'/\'/g" )
+JSON="{\"channel\": \"$SLACK_CHANNEL\", \"icon_emoji\":\"robot_face\", \"text\": \"$SLACK_MESSAGE\"}"
+curl -s -d "payload=$JSON" "$SLACK_URL"

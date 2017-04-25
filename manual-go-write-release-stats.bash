@@ -1,21 +1,27 @@
 #!/bin/bash
+
+USAGE='Usage: "./post2slack <STAGE|PROD>"'
+ENVIRONMENT=${1^^}
+
+if [[ "${ENVIRONMENT}" == stage ]]; then  GO_ENVIRONMENT_NAME="";else  GO_ENVIRONMENT_NAME="Production_Installs"; fi
+
 PRODUCT="adcenter"
 BRANCH=`git rev-parse --abbrev-ref HEAD`
 WORK_DIR=`pwd`
 AGENT=`echo ${HOSTNAME} |sed 's/\..*//g'`
 GO_REVISION=`git log -n 1 --date=short --pretty=format:"%H"`
-ARTIFACT=`git log -n 1 --date=short --pretty=format:"%h"`
+ARTIFACT=`git log -n 1 --date=short --pretty=format:"%H"`
 AUTHOR_NAME=`git log -n 1 --pretty=format:"%cn"`
 AUTHOR_NAME=`echo $AUTHOR_NAME |sed 's| |_|g'`
 AUTHOR_EMAIL=`git log -n 1 --pretty=format:"%ae"`
 COMMIT_DATE=`git log -n 1 --date=short --pretty=format:"%cd"`
 COMMIT_MESSAGE=`git log -n 1 --pretty=format:"%s"`
 GO_TRIGGER_USER=`echo ${USER}`
-GO_PIPELINE_NAME="${PRODUCT}.${BRANCH}.Deployment"
+GO_PIPELINE_NAME="${PRODUCT}.${ENVIRONMENT}.Deployment"
 GO_PIPELINE_COUNTER=1
 GO_PIPELINE_LABEL=1
 GO_STAGE_COUNTER=1
-GO_STAGE_NAME="${PRODUCT}.${BRANCH}.Install"
+GO_STAGE_NAME="${PRODUCT}.${ENVIRONMENT}.Install"
 GO_JOB_NAME="install.the.code"
 EPOCH_TIME=`date +%s%N`
 if [[ "${HOSTNAME}" == *q.qa* ]]; then  GO_ENVIRONMENT_NAME="QA_Build_Installs";else  GO_ENVIRONMENT_NAME="Production_Installs"; fi
